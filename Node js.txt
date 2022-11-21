@@ -1,0 +1,122 @@
+tahap 1
+npm install nodemon xpress mongoose cors
+
+const express = require("express");
+const mongoose = require('mongoose')
+const app = express();
+
+*Kalo sudah ke tahap 5 tambahkan --> const siswaRouter = require('./router/siswaRouter')
+
+tahap 2 
+connect mongo db
+
+mongoose.connect('mongodb+srv://Romli:romli123@cluster0.cwrdbfv.mongodb.net/?retryWrites=true&w=majority').then(() => {
+  app.use(express.json())
+
+	*Kalo sudah ke tahap 5 tambahkan --> app.use(siswaRouter)
+
+  app.listen(4000, () => {
+    console.log("Server is running")
+  })
+})
+
+tahap 3 bikin model
+
+const mongoose  = require('mongoose')
+
+const SiswaSchema = new mongoose.Schema({
+  nama: {
+    type: String,
+    required: true
+  },
+  jurusan: {
+    type: String,
+    required: true
+  },
+  kelas: {
+    type: String,
+    required: true
+  },
+}) 
+
+module.exports = mongoose.model("siswa", SiswaSchema)
+
+
+tahap 4
+bikin controllers
+
+const Siswa = require('../model/siswaModel')
+
+const getSiswa = async (req, res) => {
+  try {
+    const dataSiswa = await Siswa.find()
+
+    res.json({ data: dataSiswa })
+  } catch (err) {
+    res.status(422).json({ message: err.message })
+  }
+}
+
+const createSiswa = async (req, res) => {
+  try {
+    const { nama, jurusan, kelas } = req.body
+    const dataSiswa = await Siswa.create({ nama, jurusan, kelas })
+
+    res.json({ message: "Siswa Created!", siswa: dataSiswa })
+  } catch (err) {
+    res.status(422).json({ message: err.message })
+  }
+}
+
+const getOneSiswa = async (req, res) => {
+  try {
+    const { id } = req.params
+    const dataSiswa = await Siswa.findById({ _id: id })
+
+    res.status(200).json({ data: dataSiswa })
+  } catch (err) {
+    res.status(422).json({ message: err.message })
+  }
+}
+
+const deleteSiswa = async (req, res) => {
+  try {
+    const { id } = req.params
+    const dataSiswa = await Siswa.deleteOne({ _id: id })
+
+    res.status(200).json({ message: "Siswa Deleted" })
+  } catch (err) {
+    res.status(422).json({ message: err.message })
+  }
+}
+
+const updateSiswa = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { nama, jurusan, kelas } = req.body
+    const dataSiswa = await Siswa.updateOne({ _id: id }, { nama, jurusan, kelas })
+
+    res.status(200).json({ message: 'Siswa Updated!' })
+  } catch (err) {
+    res.status(422).json({ message: err.message })
+  }
+}
+
+
+module.exports = { getSiswa, createSiswa, deleteSiswa, getOneSiswa, updateSiswa }
+
+tahap 5
+bikin router
+
+const express = require('express')
+const router = express.Router()
+const { getSiswa, createSiswa, deleteSiswa, getOneSiswa, updateSiswa } = require('../controllers/siswaController')
+
+router.get("/siswa", getSiswa)
+router.get("/siswa/:id", getOneSiswa)
+router.post("/siswa", createSiswa)
+router.delete("/siswa/:id", deleteSiswa)
+router.put('/siswa/:id', updateSiswa)
+
+
+module.exports = router
