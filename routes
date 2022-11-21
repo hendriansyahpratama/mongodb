@@ -1,0 +1,14 @@
+var mongoose = require('mongoose')
+
+const Siswa = new mongoose.Schema(
+	{
+		nama: String,
+		kelas: String,
+    jurusan: String
+	},
+	{
+		collection: 'murid'
+	}
+)
+
+module.exports = mongoose.model('siswa', Siswa)
