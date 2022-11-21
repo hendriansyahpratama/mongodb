@@ -1,0 +1,59 @@
+const Siswa = require('../model/siswa')
+const routes = require('../routes/routes')
+
+routes.get('/', async (req, res) => {
+  try {
+    const dataSiswa = await Siswa.find()
+    res.status(200).json({ data: dataSiswa })
+    console.log(dataSiswa)
+  } catch (err) {
+    res.status(404).json({ message: "hendri is not defined" })
+  }
+})
+
+routes.get('/getOneSiswa', async (req, res) => {
+  try {
+    const id = req.params.id
+    const getOneSiswa = await Siswa.findById(id).exec()
+    if (!getOneSiswa) return res.status(404).json({ message: 'Siswa Tidak Ditemukan' })
+  } catch (err) {
+    res.status(400).json({ message: 'failed get siswa' })
+  }
+})
+
+routes.post('/', async (req, res) => {
+  try {
+    const createSiswa = new Siswa({
+      nama: req.body.nama,
+      kelas: req.body.kelas,
+      jurusan: req.body.jurusan
+    })
+    await createSiswa.save()
+  } catch (err) {
+    res.status(400).json({ message: 'failed create siswa' })
+  }
+})
+
+routes.put('/updateUser', async (req, res) => {
+  try {
+    const id = req.params.id
+    const updateSiswa = await Siswa.findByIdAndUpdate(id, {
+      nama: req.body.nama,
+      kelas: req.body.kelas
+    }, { new: true })
+    if (!updateSiswa) return res.status(404).json({ message: 'Siswa Not Found' })
+    res.status(200).json({ data: updateSiswa })
+  } catch (err) {
+    res.status(400).json({ message: 'failed update siswa' })
+  }
+})
+
+routes.delete('/:id', async (req, res) => {
+  try {
+    const id = req.params.id
+    const deleteSiswa = await Siswa.findByIdAndDelete(id)
+    if (!deleteSiswa) return res.status(404).json({ message: 'Siswa Tidak Di Temukan' })
+  } catch (err) {
+    res.status(400).json({ message: 'Failed Delete Siswa' })
+  }
+})
